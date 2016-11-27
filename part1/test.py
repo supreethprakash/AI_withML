@@ -1,9 +1,8 @@
 import os
 import re
+from stopWords import *
 
 wordsList = list()
-
-specialCharacters = ['\n','\t', ' ', '\r', ',', '']
 
 
 def readFile(fileName):
@@ -30,9 +29,9 @@ def addToArray(lines):
         cleanedLine = cleanHtml(line)
         word = cleanedLine.split(' ')
         for w in word:
-            if w not in wordsList and w not in specialCharacters:
-                words = ''.join(e for e in w if e.isalnum())
-                wordsList.append(words)
+            words = ''.join(e for e in w if e.isalnum())
+            if words not in wordsList and words not in specialCharacters:
+                wordsList.append(words.lower())
 
 
 if __name__ == '__main__':
@@ -45,6 +44,7 @@ if __name__ == '__main__':
                 addToArray(Lines[index+1:len(Lines)])
     file1 = open('output.txt', 'w')
     for eachword in wordsList:
-        file1.write(eachword)
-        file1.write(os.linesep)
+        if not 'nbsp' in eachword.lower() and eachword.lower() not in stopWords and eachword.isalpha():
+            file1.write(eachword)
+            file1.write(os.linesep)
     file1.close()
