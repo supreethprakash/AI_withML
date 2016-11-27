@@ -1,14 +1,11 @@
-#to remove HTML tags
-'''import re
-
-
-def cleanHtml(raw_html):
-  cleanr = re.compile('<.*?>')
-  cleantext = re.sub(cleanr, '', raw_html)
-  return cleantext
-
-print(cleanHtml("<html><body><center><b><font color=\"blue\">*****Bonus Fat Absorbers As Seen On TV, Included Free With Purchase Of 2 Or More Bottle, $24.95 Value*****</font><br><br>***TAKE $10.00 OFF 2 & 3 MONTH SUPPLY ORDERS, $5.00 OFF 1 MONTH SUPPLY!***AND STILL GET YOUR BONUS!  PRICE WILL BE DEDUCTED DURING PROCESSING.<br><r>"))
-'''
+import os
+'''start_path = '/home/rkanchib/Downloads/AI/assignment 4/anupbhar-rkanchib-skeragod-a4/part1/train'
+for path,dirs,files in os.walk(start_path):
+    for filename in files:
+        x = os.path.join(path,filename)
+        print x
+        with open(x) as file:
+            content = file.readlines()'''
 
 wordsList = list()
 
@@ -28,5 +25,11 @@ def addToArray(lines):
       wordsList.append(word)
 
 if __name__ == '__main__':
-  index, Lines = readFile('test/notspam/0002.b3120c4bcbf3101e661161ee7efcb8bf')
+  start_path = '/home/rkanchib/Downloads/AI/assignment 4/anupbhar-rkanchib-skeragod-a4/part1/train'
+  for path, dirs, files in os.walk(start_path):
+    for filename in files:
+      if filename != 'cmds':
+        x = os.path.join(path, filename)
+        index, Lines = readFile(x)
   addToArray(Lines[index+1:len(Lines)])
+  print wordsList
