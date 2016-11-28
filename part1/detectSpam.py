@@ -21,7 +21,7 @@ topTenNotSpam = dict()
 topTenBSpam = dict()
 topTenBNotSpam = dict()
 
-k = 0.7
+k = 1.5
 
 def readFile(fileName):
     flag = False
@@ -42,7 +42,7 @@ def readModel(fileName):
     file.close()
     for line in eachline:
         values = line.split('\t')
-        if values[3] == 's':
+        if values[3].strip() == 's':
             spamWords[values[0]] = values[1]
             binarySpam[values[0]] = values[2]
         else:
