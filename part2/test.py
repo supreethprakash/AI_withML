@@ -36,6 +36,7 @@ def test_data(model,dataset_dir):
                 count_correct_classification += 1
     print("Number of documents read = %d" %doc_count)
     print("Number of true classification = %d" %count_correct_classification)
+    print("Accuracy: %f" %((float(count_correct_classification)/doc_count) * 100))
 
 
 

@@ -9,8 +9,10 @@ class Train:
         self.word_count = len(data)
 
     def find_prob(self,word,topic):
+        if word not in self.data:
+            return 1.0/12
         if self.data[word][topic] == 0:
-            return 0.000000001
+            return 1.0/(self.word_count * 10)#0.000000001
         return float(self.data[word][topic])/sum(self.data[word].values())
 
     def find_topic_prob(self,topic):
@@ -39,7 +41,7 @@ def sanitize_content(content):
     content = translate_content(content,trans_table)
     trans_table = content.maketrans(string.digits," "* len(string.digits))
     content = translate_content(content, trans_table)
-    sanitized_content = [word for word in content.split() if word not in stopWords and len(word) > 1]
+    sanitized_content = [word for word in content.split() if word not in stopWords and len(word) > 2]
     return sanitized_content
 
 specialCharacters = ['\n','\t', ' ', '\r', ',', '']
