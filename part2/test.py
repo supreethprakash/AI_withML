@@ -34,6 +34,8 @@ def test_data(model,dataset_dir):
 
             if classified_topic == topic:
                 count_correct_classification += 1
+            else:
+                print("Document was classified as %s but ground truth was %s" %(classified_topic,topic))
     print("Number of documents read = %d" %doc_count)
     print("Number of true classification = %d" %count_correct_classification)
     print("Accuracy: %f" %((float(count_correct_classification)/doc_count) * 100))
