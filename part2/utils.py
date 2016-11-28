@@ -16,7 +16,7 @@ class Train:
         return float(self.data[word][topic])/sum(self.data[word].values())
 
     def find_topic_prob(self,topic):
-        return float(self.topics[topic]/self.word_count)
+        return float(self.topics[topic])/self.word_count
 
 stopWords = ['a','about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'arent', 'as',
 			 'at', 'because', 'be', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'cant', 'cannot',

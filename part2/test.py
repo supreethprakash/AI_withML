@@ -1,7 +1,7 @@
 import os
 import email
 import utils
-import operator
+import math
 
 
 def test_data(model,dataset_dir):
@@ -24,10 +24,10 @@ def test_data(model,dataset_dir):
             words = utils.sanitize_content(content)
 
             for cur_topic in model.topics.keys():
-                prob = 1.0
+                prob = 0.0
                 for word in words:
-                    prob *= model.find_prob(word,cur_topic)
-                prob *= model.find_topic_prob(cur_topic)
+                    prob += math.log(model.find_prob(word,cur_topic))
+                prob += math.log(model.find_topic_prob(cur_topic))
                 topic_prob[cur_topic] = prob
 
             classified_topic = max(topic_prob, key=topic_prob.get)
