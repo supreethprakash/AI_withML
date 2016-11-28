@@ -6,6 +6,8 @@ from collections import Counter
 
 spamWordCount = Counter()
 nonspamWordCount = Counter()
+noOfSpamFiles = 0
+noOfNonSpamFiles = 0
 
 def readFile(fileName):
     file = open(fileName, 'r')
@@ -44,26 +46,29 @@ if __name__ == '__main__':
     spam_path = 'train/spam'
     nonspam_path = 'train/notspam'
     for path, dirs, files in os.walk(spam_path):
-        print len(files)
+        noOfSpamFiles = len(files) - 1
         for filename in files:
             if filename != 'cmds':
                 x = os.path.join(path, filename)
                 index, Lines = readFile(x)
                 addToArray(Lines[index+1:len(Lines)],'spam')
     for path, dirs, files in os.walk(nonspam_path):
-        print len(files)
+        noOfNonSpamFiles = len(files) - 1
         for filename in files:
             if filename != 'cmds':
                 x = os.path.join(path, filename)
                 index, Lines = readFile(x)
                 addToArray(Lines[index + 1:len(Lines)],'nonspam')
 
+    numOfSpams = noOfSpamFiles / ((noOfSpamFiles + noOfNonSpamFiles) * 1.0)
+    numOfNonSpams = noOfNonSpamFiles / ((noOfSpamFiles + noOfNonSpamFiles) * 1.0)
+
     file = open('modelFile.txt', 'w')
     for eachword in spamWordCount:
-        file.write(eachword + '\t' + '{0:.16f}'.format(spamWordCount[eachword]/ (sum(spamWordCount.values()) * 1.0)) + '\t' + 's')
+        file.write(eachword + '\t' + '{0:.16f}'.format((spamWordCount[eachword]/ (sum(spamWordCount.values()) * 1.0)) * numOfSpams) + '\t' + 's')
         file.write(os.linesep)
     for eachword in nonspamWordCount:
-        file.write(eachword + '\t' + '{0:.16f}'.format(nonspamWordCount[eachword] / (sum(nonspamWordCount.values()) * 1.0)) + '\t' + 'ns')
+        file.write(eachword + '\t' + '{0:.16f}'.format((nonspamWordCount[eachword] / (sum(nonspamWordCount.values()) * 1.0)) * numOfNonSpams) + '\t' + 'ns')
         file.write(os.linesep)
     file.close()
 
