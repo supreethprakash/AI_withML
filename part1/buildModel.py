@@ -65,10 +65,10 @@ if __name__ == '__main__':
 
     file = open('modelFile.txt', 'w')
     for eachword in spamWordCount:
-        file.write(eachword + '\t' + '{0:.16f}'.format((spamWordCount[eachword]/ (sum(spamWordCount.values()) * 1.0)) * numOfSpams) + '\t' + 's')
+        file.write(eachword + '\t' + '{0:.16f}'.format((spamWordCount[eachword]/ (sum(spamWordCount.values()) * 1.0)) * numOfSpams) + '\t' + '{0:.16f}'.format(( 1 / (len(spamWordCount) * 1.0)) * numOfSpams) + '\t' + 's')
         file.write(os.linesep)
     for eachword in nonspamWordCount:
-        file.write(eachword + '\t' + '{0:.16f}'.format((nonspamWordCount[eachword] / (sum(nonspamWordCount.values()) * 1.0)) * numOfNonSpams) + '\t' + 'ns')
+        file.write(eachword + '\t' + '{0:.16f}'.format((nonspamWordCount[eachword] / (sum(nonspamWordCount.values()) * 1.0)) * numOfNonSpams) + '\t' + '{0:.16f}'.format(( 1 / (len(nonspamWordCount) * 1.0)) * numOfSpams) + '\t' + 'ns')
         file.write(os.linesep)
     file.close()
 
