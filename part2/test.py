@@ -24,7 +24,7 @@ def test_data(model,dataset_dir):
             words = utils.sanitize_content(content)
 
             for cur_topic in model.topics.keys():
-                prob = 0.0
+                prob = 1.0
                 for word in words:
                     prob *= model.find_prob(word,cur_topic)
                 prob *= model.find_topic_prob(cur_topic)
