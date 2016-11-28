@@ -1,9 +1,11 @@
 import os
 import re
 from stopWords import *
+from collections import defaultdict
+from collections import Counter
 
-wordsList = list()
-
+spamWordCount = Counter()
+nonspamWordCount = Counter()
 
 def readFile(fileName):
     file = open(fileName, 'r')
@@ -24,27 +26,35 @@ def cleanHtml(raw_html):
     return cleantext1
 
 
-def addToArray(lines):
+def addToArray(lines, mode):
     for line in lines:
         cleanedLine = cleanHtml(line)
         word = cleanedLine.split(' ')
         for w in word:
+            w = w.lower()
             words = ''.join(e for e in w if e.isalnum())
-            if words not in wordsList and words not in specialCharacters:
-                wordsList.append(words.lower())
+            if not 'nbsp' in words and words not in stopWords and words.isalpha():
+                if mode == 'spam':
+                    spamWordCount[words] += 1
+                else:
+                    nonspamWordCount[words] += 1
 
 
 if __name__ == '__main__':
-    start_path = 'train/spam/'
-    for path, dirs, files in os.walk(start_path):
+    spam_path = 'train/spam'
+    nonspam_path = 'train/notspam'
+    for path, dirs, files in os.walk(spam_path):
         for filename in files:
             if filename != 'cmds':
                 x = os.path.join(path, filename)
                 index, Lines = readFile(x)
-                addToArray(Lines[index+1:len(Lines)])
-    file1 = open('output.txt', 'w')
-    for eachword in wordsList:
-        if not 'nbsp' in eachword.lower() and eachword.lower() not in stopWords and eachword.isalpha():
-            file1.write(eachword)
-            file1.write(os.linesep)
-    file1.close()
+                addToArray(Lines[index+1:len(Lines)],'spam')
+    for path, dirs, files in os.walk(nonspam_path):
+        for filename in files:
+            if filename != 'cmds':
+                x = os.path.join(path, filename)
+                index, Lines = readFile(x)
+                addToArray(Lines[index + 1:len(Lines)],'nonspam')
+
+    print spamWordCount
+    print nonspamWordCount

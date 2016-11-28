@@ -11,4 +11,4 @@ stopWords = ['a','about', 'above', 'after', 'again', 'against', 'all', 'am', 'an
 			 'there', 'theres', 'they', 'theyd', 'theyll','theyre', 'theyve', 'this', 'those', 'though', 'through', 'to', 'too', 'under',
 			 'until', 'up', 'very', 'was', 'wasnt', 'we', 'wed', 'well', 'were', 'weve', 'werent', 'what', 'whats', 'when', 'whens', 'where',
 			 'wheres', 'which', 'while', 'who', 'whos', 'whom', 'why', 'whys', 'with', 'wont', 'would', 'wouldnt', 'you', 'youd', 'youll',
-			 'youre', 'youve', 'your', 'yours', 'yourself', 'yourselves', 'font', 'html', 'table', 'br']
+			 'youre', 'youve', 'your', 'yours', 'yourself', 'yourselves', 'font', 'html', 'table', 'br', 'will']
