@@ -37,10 +37,12 @@ def translate_content(content,trans_table):
 
 def sanitize_content(content):
     content = content.lower()
-    trans_table = content.maketrans(string.punctuation," " * len(string.punctuation))
-    content = translate_content(content,trans_table)
-    trans_table = content.maketrans(string.digits," "* len(string.digits))
-    content = translate_content(content, trans_table)
+    # trans_table = content.maketrans(string.punctuation," " * len(string.punctuation))
+    # content = translate_content(content,trans_table)
+    # trans_table = content.maketrans(string.digits," "* len(string.digits))
+    # content = translate_content(content, trans_table)
+    content = content.translate(None,string.punctuation)
+    content = content.translate(None,string.digits)
     sanitized_content = [word for word in content.split() if word not in stopWords and len(word) > 2]
     return sanitized_content
 
