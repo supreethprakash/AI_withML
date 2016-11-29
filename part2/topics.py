@@ -7,14 +7,23 @@ import pickle
 
 def serialize_model(model,filename):
     try:
-        pickle.dump(model,open(filename,"wb"))
+        f_ptr = open(filename,"wb")
+        pickle.dump(model,f_ptr)
+        f_ptr.close()
     except Exception:
         print("Serialization Failed")
         return False
 
 
 def deserialize_model(model_filename):
-    return pickle.load(open(model_filename,"rb"))
+    try:
+        f_ptr = open(model_filename,"rb")
+        obj = pickle.load(f_ptr)
+        f_ptr.close()
+        return obj
+    except Exception:
+        print("Deserialization Failed")
+        return False
 
 
 if len(argv) < 4:
