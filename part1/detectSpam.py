@@ -4,7 +4,10 @@ This file is to detect whether the given Email is a spam or not
 
 import os
 import re
+import buildModel
+import math
 from collections import OrderedDict
+from collections import Counter
 from heapq import nsmallest
 from heapq import nlargest
 
@@ -28,20 +31,15 @@ def readFile(fileName):
     file = open(fileName, 'r')
     lines = file.readlines()
     file.close()
-    for i in range(len(lines)):
-        if lines[i].isspace() == True:
-            flag = True
-            return i, lines
-    if flag == False:
-        return len(lines), lines
-
+    return 0,lines
+    
 
 def readModel(fileName):
     file = open(fileName, 'r')
     eachline = file.readlines()
     file.close()
     for line in eachline:
-        values = line.split('\t')
+        values = line.split(' ')
         if values[3].strip() == 's':
             spamWords[values[0]] = values[1]
             binarySpam[values[0]] = values[2]
@@ -63,46 +61,42 @@ def checkSpam(lines, mode, confusionMatrix, confusionMatrixB):
     Q1 = 0
     Q2 = 0
     numberOfWords = 0
-
+    wc = Counter()
+    spamProbability = 0
+    bSpamProbability = 0
+    nonSpamProbability = 0
+    bNonSpamProbability = 0
     for line in lines:
-        cleanedLine = cleanHtml(line)
-        word = cleanedLine.split(' ')
+        #cleanedLine = cleanHtml(line)
+        word = line.split(' ')
         for w in word:
-            numberOfWords += 1
-            w = w.lower()
-            words = ''.join(e for e in w if e.isalpha())
-            if words in spamWords:
-                spamProbability = float(spamWords[words])
-                bSpamProbability = float(binarySpam[words])
-            else:
-                spamProbability = 0.00000000001
-                bSpamProbability = 0
+            wc[w] += 1
 
-            if words in nonSpamWords:
-                nonSpamProbability = float(nonSpamWords[words])
-                bNonSpamProbability = float(binaryNonSpam[words])
-            else:
-                nonSpamProbability = 0.00000000001
-                bNonSpamProbability = 0
+    for k,v in wc.iteritems():
+        if k in spamWords:
+            spamProbability += math.log(float(v)/float(spamWords[k]))
+            bSpamProbability += math.log(float(v)/float(binarySpam[k]))
+        else:
+            spamProbability += math.log(float(1)/2)
+            bSpamProbability += 0
 
-            if spamProbability == 0 or nonSpamProbability == 0:
-                Q1 += 0
-            else:
-                Q1 += spamProbability / (nonSpamProbability * 1.0)
+        if k in nonSpamWords:
+            nonSpamProbability += math.log(float(v) / float(nonSpamWords[k]))
+            bNonSpamProbability += math.log(float(v) / float(binaryNonSpam[k]))
+        else:
+            nonSpamProbability += math.log(float(1) / 2)
+            bNonSpamProbability += 0
+    spamProbability = spamProbability * 0.458774583964
+    nonSpamProbability = nonSpamProbability * 0.541225416036
+    bSpamProbability = bSpamProbability * 0.458774583964
+    bNonSpamProbability = bNonSpamProbability * 0.541225416036
+    Q1 = spamProbability/nonSpamProbability
+    if bNonSpamProbability != 0.0:
+        Q2 = bSpamProbability/bNonSpamProbability
+    else:
+        Q2 = 0
 
-            if bSpamProbability == 0 or bNonSpamProbability == 0:
-                Q2 += 0
-            else:
-                Q2 += bSpamProbability / (bNonSpamProbability * 1.0)
-
-
-            topTenSpam[words] = spamProbability
-            topTenNotSpam[words] = nonSpamProbability
-            topTenBSpam[words] = bSpamProbability
-            topTenBNotSpam[words] = bNonSpamProbability
-
-
-    if (Q1 / (numberOfWords * 1.0)) > k :
+    if Q1 > 0.84:
         m = 'spam'
     else:
         m = 'nonspam'
@@ -118,7 +112,7 @@ def checkSpam(lines, mode, confusionMatrix, confusionMatrixB):
         else:
             confusionMatrix['tn'] += 1
 
-    if (Q2 / (numberOfWords * 1.0)) > k :
+    if Q2 > 0.83:
         m = 'spam'
     else:
         m = 'nonspam'
