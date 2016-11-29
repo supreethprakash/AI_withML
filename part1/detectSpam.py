@@ -32,7 +32,7 @@ def readFile(fileName):
     lines = file.readlines()
     file.close()
     return 0,lines
-    
+
 
 def readModel(fileName):
     file = open(fileName, 'r')
