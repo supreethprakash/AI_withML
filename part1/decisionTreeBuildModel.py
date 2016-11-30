@@ -21,11 +21,7 @@ def createMatrix(lines, mode, fileName):
 				else:
 					nonSpamWordCount[words] += 1
 
-	if mode == 'spam':
-		documentMatrix[fileName] = spamWordCount
-	else:
-		documentMatrix[fileName] = nonSpamWordCount
-
+	documentMatrix[fileName] = spamWordCount if mode == 'spam' else nonSpamWordCount
 
 def addTrainingData():
 	counter = 0
@@ -37,10 +33,8 @@ def addTrainingData():
 				if filename != 'cmds':
 					x = os.path.join(path, filename)
 					Lines = readFile(x)
-					if i == 0:
-						createMatrix(Lines, 'spam', filename)
-					else:
-						createMatrix(Lines, 'notspam', filename)
+					createMatrix(Lines, 'spam', filename) if i == 0 else createMatrix(Lines, 'notspam', filename)
 
 if __name__ == '__main__':
 	addTrainingData()
+	print len(documentMatrix)
