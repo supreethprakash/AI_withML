@@ -1,14 +1,11 @@
 import os
 import re
-from detectSpam import *
 from stopWords import *
 from collections import defaultdict
 from collections import Counter
 
 spamWordCount = Counter()
-binarySpamWordCount = Counter()
 nonspamWordCount = Counter()
-binaryNonSpamWordCount = Counter()
 noOfSpamFiles = 0
 noOfNonSpamFiles = 0
 
@@ -16,7 +13,8 @@ def readFile(fileName):
     file = open(fileName, 'r')
     lines = file.readlines()
     file.close()
-    return 0,lines
+    return 0, lines
+
 
 def cleanHtml(raw_html):
     cleanr = re.compile('<.*?>')
@@ -32,22 +30,14 @@ def addToArray(lines, mode):
     for line in lines:
         #cleanedLine = cleanHtml(line)
         word = line.split(' ')
-        words = []
         for w in word:
             w = w.lower()
-            #words = ''.join(e for e in w if e.isalnum())
-            if not 'nbsp' in w and w not in stopWords and w.isalpha():
+            words = ''.join(e for e in w if e.isalnum())
+            if not 'nbsp' in words and words not in stopWords and words.isalpha():
                 if mode == 'spam':
-                    spamWordCount[w] += 1
-                    if w not in words:
-                        words.append(w)
-                        binarySpamWordCount[w] += 1
+                    spamWordCount[words] += 1
                 else:
-                    nonspamWordCount[w] += 1
-                    if w not in words:
-                        words.append(w)
-                        binaryNonSpamWordCount[w] += 1
-
+                    nonspamWordCount[words] += 1
 
 
 if __name__ == '__main__':
@@ -59,27 +49,24 @@ if __name__ == '__main__':
             if filename != 'cmds':
                 x = os.path.join(path, filename)
                 index, Lines = readFile(x)
-                addToArray(Lines,'spam')
+                addToArray(Lines[index+1:len(Lines)],'spam')
     for path, dirs, files in os.walk(nonspam_path):
         noOfNonSpamFiles = len(files) - 1
         for filename in files:
             if filename != 'cmds':
                 x = os.path.join(path, filename)
                 index, Lines = readFile(x)
-                addToArray(Lines,'nonspam')
+                addToArray(Lines[index + 1:len(Lines)],'nonspam')
 
     numOfSpams = noOfSpamFiles / ((noOfSpamFiles + noOfNonSpamFiles) * 1.0)
     numOfNonSpams = noOfNonSpamFiles / ((noOfSpamFiles + noOfNonSpamFiles) * 1.0)
 
-    print numOfSpams
-    print numOfNonSpams
-
     file = open('modelFile.txt', 'w')
     for eachword in spamWordCount:
-        file.write(eachword.strip() + ' ' + str(spamWordCount[eachword]) + ' ' + str(binarySpamWordCount[eachword]) + ' ' + 's')
+        file.write(eachword + '\t' + '{0:.16f}'.format((spamWordCount[eachword]/ (sum(spamWordCount.values()) * 1.0)) * numOfSpams) + '\t' + '{0:.16f}'.format(( 1 / (len(spamWordCount) * 1.0)) * numOfSpams) + '\t' + 's')
         file.write(os.linesep)
     for eachword in nonspamWordCount:
-        file.write(eachword.strip() + ' ' + str(nonspamWordCount[eachword]) + ' ' + str(binaryNonSpamWordCount[eachword]) + ' ' + 'ns')
+        file.write(eachword + '\t' + '{0:.16f}'.format((nonspamWordCount[eachword] / (sum(nonspamWordCount.values()) * 1.0)) * numOfNonSpams) + '\t' + '{0:.16f}'.format(( 1 / (len(nonspamWordCount) * 1.0)) * numOfSpams) + '\t' + 'ns')
         file.write(os.linesep)
     file.close()
 
