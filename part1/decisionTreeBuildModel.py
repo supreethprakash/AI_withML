@@ -7,26 +7,29 @@ documentMatrix = dict()
 
 
 def createMatrix(lines, mode, fileName):
-	spamWordCount = Counter()
-	nonSpamWordCount = Counter()
+	wordCount = Counter()
+	valCount = []
 	documentMatrix[fileName] = []
 	for line in lines:
 		word = line.split(' ')
 		for w in word:
 			w = w.lower()
 			words = ''.join(e for e in w if e.isalnum())
-			if not 'nbsp' in words and words not in stopWords and words.isalpha():
-				if mode == 'spam':
-					spamWordCount[words] += 1
-				else:
-					nonSpamWordCount[words] += 1
+			wordCount[words] += 1
+
+	for word in bagOfWords:
+		if word in wordCount:
+			valCount.append(wordCount[word])
+		else:
+			valCount.append(0)
 
 	if mode == 'spam':
-		documentMatrix[fileName].append(spamWordCount)
+		documentMatrix[fileName].append(valCount)
 		documentMatrix[fileName].append('spam')
 	else:
-		documentMatrix[fileName].append(nonSpamWordCount)
+		documentMatrix[fileName].append(valCount)
 		documentMatrix[fileName].append('notspam')
+
 
 def addTrainingData():
 	counter = 0
@@ -41,4 +44,5 @@ def addTrainingData():
 					createMatrix(Lines, 'spam', filename) if i == 0 else createMatrix(Lines, 'notspam', filename)
 
 if __name__ == '__main__':
+	bagOfWords = readModelFile()
 	addTrainingData()
