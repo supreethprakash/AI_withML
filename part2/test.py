@@ -4,6 +4,8 @@ import utils
 import math
 
 
+
+
 def test_data(model,dataset_dir):
     doc_count = 0
     count_correct_classification = 0
@@ -23,19 +25,19 @@ def test_data(model,dataset_dir):
             content = email_obj.get_payload()
             words = utils.sanitize_content(content)
 
-            for cur_topic in model.topics.keys():
-                prob = 0.0
-                for word in words:
-                    prob += math.log(model.find_prob(word,cur_topic))
-                prob += math.log(model.find_topic_prob(cur_topic))
-                topic_prob[cur_topic] = prob
-
-            classified_topic = max(topic_prob, key=topic_prob.get)
+            # for cur_topic in model.topics.keys():
+            #     prob = 0.0
+            #     for word in words:
+            #         prob += math.log(model.find_prob(word,cur_topic))
+            #     prob += math.log(model.find_topic_prob(cur_topic))
+            #     topic_prob[cur_topic] = prob
+            classified_topic = utils.find_topic(model,words)
 
             if classified_topic == topic:
                 count_correct_classification += 1
             else:
-                print("Document was classified as %s but ground truth was %s" %(classified_topic,topic))
+                #print("Document was classified as %s but ground truth was %s" %(classified_topic,topic))
+                print(count_correct_classification)
     print("Number of documents read = %d" %doc_count)
     print("Number of true classification = %d" %count_correct_classification)
     print("Accuracy: %f" %((float(count_correct_classification)/doc_count) * 100))
