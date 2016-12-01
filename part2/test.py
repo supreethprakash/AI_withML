@@ -1,46 +1,28 @@
 import os
-import email
 import utils
-import math
+from collections import Counter, defaultdict
 
 
-
-
-def test_data(model,dataset_dir):
+def test_data(model, dataset_dir):
+    confusion_matrix = defaultdict(Counter)
     doc_count = 0
     count_correct_classification = 0
+    print("Testing Data...")
+    print("Please wait...")
     for topic in os.listdir(dataset_dir):
 
         if topic.startswith('.'):
             continue
         topic_dir = dataset_dir + "/" + topic
 
-        for file in os.listdir(topic_dir):
-            topic_prob = {}
+        for test_file in os.listdir(topic_dir):
             doc_count += 1
-            file_path = topic_dir + "/" + file
-            f_ptr = open(file_path, "r")
-            email_obj = email.message_from_file(f_ptr)
-            f_ptr.close()
-            content = email_obj.get_payload()
-            words = utils.sanitize_content(content)
-
-            # for cur_topic in model.topics.keys():
-            #     prob = 0.0
-            #     for word in words:
-            #         prob += math.log(model.find_prob(word,cur_topic))
-            #     prob += math.log(model.find_topic_prob(cur_topic))
-            #     topic_prob[cur_topic] = prob
-            classified_topic = utils.find_topic(model,words)
+            file_path = topic_dir + "/" + test_file
+            words = utils.get_file_content(file_path)
+            classified_topic = utils.find_topic(model, words)
 
             if classified_topic == topic:
                 count_correct_classification += 1
-            else:
-                #print("Document was classified as %s but ground truth was %s" %(classified_topic,topic))
-                print(count_correct_classification)
-    print("Number of documents read = %d" %doc_count)
-    print("Number of true classification = %d" %count_correct_classification)
-    print("Accuracy: %f" %((float(count_correct_classification)/doc_count) * 100))
 
-
-
+            confusion_matrix[topic][classified_topic] += 1
+    return utils.Test(confusion_matrix, count_correct_classification, doc_count)

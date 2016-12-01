@@ -1,36 +1,22 @@
+import string
 from collections import Counter
 from collections import defaultdict
 import os
 import utils
-import email
 import random
+import copy
 
 
 def read_classification(prob):
     rand_val = random.random()
     return rand_val < prob
 
-#
-#
-# def get_rand_topic(lst):
-#     return random.choice(lst)
-#
-#
-# def find_topic(word, model, topics):
-#     most_common_count = model[word].most_common(1)
-#
-#     if len(most_common_count) == 0:
-#         topic = get_rand_topic(topics)
-#     else:
-#         topic = most_common_count[0][0]
-#     return topic
-
 
 def update_model(data, words, prev, cur):
     for word in words:
         if prev != "None":
-            data[word][prev] -= 1
-        data[word][cur] += 1
+            data[prev][word] -= 1
+        data[cur][word] += 1
     return data
 
 
@@ -49,9 +35,8 @@ def find_topic(model, words):
 
 
 def train_unclassified(unclassified, model):
+    new_model = copy.deepcopy(model)
     count = 0
-    temp = model.data
-    temp_topics = model.topics
     for key in unclassified.keys():
         item = unclassified[key]
         words = item[0]
@@ -59,41 +44,60 @@ def train_unclassified(unclassified, model):
         new_topic = find_topic(model, words)
         if prev_topic != new_topic:
             count += 1
-            print("Topic changed: %s -> %s" % (prev_topic, new_topic))
-            temp = update_model(temp, words, prev_topic, new_topic)
-            temp_topics = update_topics(temp_topics, prev_topic, new_topic, len(words))
-            unclassified[key] = (words, new_topic)
-    model.update_data(temp, temp_topics)
+            if prev_topic == "None":
+                for word in words:
+                    new_model.word_counter[word] += 1
 
-    return model, count
+            new_model.data = update_model(new_model.data, words, prev_topic, new_topic)
+            new_model.topics = update_topics(new_model.topics, prev_topic, new_topic, len(words))
+            if prev_topic != "None":
+                new_model.doc_topic_counter[prev_topic] -= 1
+            new_model.doc_topic_counter[new_topic] += 1
+            unclassified[key] = (words, new_topic)
+
+    new_model.update_counts()
+
+    return new_model, count
+
+
+def random_name():
+    return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(4))
 
 
 def train_data(dataset_dir, fraction):
     unclassified = {}
     model = defaultdict(Counter)
     topics = Counter()
+    word_counter = Counter()
+    doc_topic_counter = Counter()
     for topic in os.listdir(dataset_dir):
         if topic.startswith('.'):
             continue
-        utils.topics.append(topic)
         topic_dir = dataset_dir + "/" + topic
 
         for cur_file in os.listdir(topic_dir):
             file_path = topic_dir + "/" + cur_file
-            f_ptr = open(file_path, "r")
-            email_obj = email.message_from_file(f_ptr)
-            f_ptr.close()
-            content = email_obj.get_payload()
-            words = utils.sanitize_content(content)
+            words = utils.get_file_content(file_path)
             if read_classification(fraction):
                 topics[topic] += len(words)
+                doc_topic_counter[topic] += 1
                 for word in words:
-                    model[word][topic] += 1
+                    model[topic][word] += 1
+                    word_counter[word] += 1
             else:
                 topics[topic] += 0
-                unclassified[cur_file] = (words, 'None')
-    model_obj = utils.Train(model, topics)
+                doc_topic_counter[topic] += 0
+                if cur_file not in unclassified:
+                    unclassified[cur_file] = (words, 'None')
+                else:
+                    new_name = cur_file + random_name()
+                    while new_name in unclassified:
+                        print("Double duplicate found!")
+                        new_name = cur_file + random_name()
+                    unclassified[new_name] = (words, 'None')
+    model_obj = utils.Train(model, topics, word_counter, doc_topic_counter)
     for i in range(24):
+        print("Iteration %d" % i)
         model_obj, count_changed = train_unclassified(unclassified, model_obj)
         if count_changed == 0:
             break
