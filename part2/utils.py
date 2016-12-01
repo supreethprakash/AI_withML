@@ -70,6 +70,9 @@ class Model:
         return self.word_counter[word] == 0
 
 # Stop words to remove during processing the documents.
+# Some are taken from the internet and modified to suit our model.
+# https://github.com/Alir3z4/python-stop-words
+
 stopWords = ['a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'arent', 'as',
              'at', 'because', 'be', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'cant',
              'cannot',
