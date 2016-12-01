@@ -1,7 +1,14 @@
-import string, math, random, email
+import email
+import math
+import random
+import string
 
 
-class Test:
+class Result:
+    """
+    Has the confusion matrix, documents classified correctly and total number of documents tested against.
+    Also handles displaying the results on the console.
+    """
     def __init__(self, confusion_matrix, correct_classification, total_documents):
         self.confusion_matrix = confusion_matrix
         self.right = correct_classification
@@ -24,7 +31,10 @@ class Test:
         return ' '.join(str_formatter)
 
 
-class Train:
+class Model:
+    """
+    The model for our topic classification. Holds the word count, topic count, word-topic distribution and doc count.
+    """
     def __init__(self, data, topics, word_counter, doc_topic_counter):
         self.data = data
         self.topics = topics
@@ -33,19 +43,23 @@ class Train:
         self.doc_topic_counter = doc_topic_counter
         self.doc_count = sum(self.doc_topic_counter.values())
 
+    # To ensure our count related properties are not outdated.
     def update_counts(self):
         self.word_count = sum(self.topics.values())
         self.doc_count = sum(self.doc_topic_counter.values())
 
+    # Returns the probability of a word|topic
     def find_prob(self, word, topic):
+        # Return a random value if word is unknown.
         if self.is_new_word(word):
             return random.random()
-
+        # A very low value if the word never occurred for a given topic.
         if self.data[topic][word] == 0:
             return 1.0 / self.word_count
 
         return float(self.data[topic][word]) / self.get_word_count(word)
 
+    # Returns the probability of a topic in our model.
     def find_topic_prob(self, topic):
         return float(self.doc_topic_counter[topic]) / self.doc_count
 
@@ -55,6 +69,9 @@ class Train:
     def is_new_word(self, word):
         return self.word_counter[word] == 0
 
+# Stop words to remove during processing the documents.
+# Some are taken from the internet and modified to suit our model.
+# https://github.com/Alir3z4/python-stop-words
 
 stopWords = ['a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'arent', 'as',
              'at', 'because', 'be', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'cant',
@@ -81,6 +98,7 @@ stopWords = ['a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'a
              'article', 'says', 'can', 'one', 'use', 'writes']
 
 
+# Returns the topic with the highest probability for the given word. Calculates log addition.
 def find_topic(model, words):
     topic_prob = {}
     for cur_topic in model.topics.keys():
@@ -97,10 +115,7 @@ def find_topic(model, words):
     return classified_topic
 
 
-def translate_content(content, trans_table):
-    return content.translate(trans_table)
-
-
+# Remove punctuation, digits and stop words.
 def sanitize_content(content):
     content = content.lower()
     content = content.translate(None, string.punctuation)
@@ -109,6 +124,7 @@ def sanitize_content(content):
     return sanitized_content
 
 
+# Returns the list of sanitized words from the file.
 def get_file_content(file_path):
     f_ptr = open(file_path, "r")
     email_obj = email.message_from_file(f_ptr)
