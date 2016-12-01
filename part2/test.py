@@ -1,9 +1,6 @@
 import os
 import email
 import utils
-import math
-
-
 
 
 def test_data(model,dataset_dir):

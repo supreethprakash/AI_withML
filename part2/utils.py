@@ -18,7 +18,6 @@ class Train:
         self.topics = topics
         self.word_count = sum(self.topics.values())# self.find_word_count()
 
-
     def find_prob(self, word, topic):
         if word not in self.data:
             return 1.0 / 20
