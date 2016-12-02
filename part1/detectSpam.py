@@ -147,15 +147,15 @@ def readTestData(directory, modelFile):
 
    print 'Testing is done. Below are the results\n'
 
-   print '\nThe total accuracy is ' + str(accuracy) + '%'
-
-   print '\nThe total accuracy is ' + str(accuracyB) + '%'
+   print '\nThe total accuracy taking into account word frequency is ' + str(accuracy) + '%'
 
    print '\nTop ten words associated with spam:\n'
    printTopTen(spamWords)
 
    print '\nTop ten words least associated with not spam:\n'
    printTopTen(nonSpamWords)
+
+   print '\nThe total accuracy for Binary is ' + str(accuracyB) + '%'
 
    print '\nTop ten words associated with spam(Binary):\n'
    printTopTen(binarySpam)
