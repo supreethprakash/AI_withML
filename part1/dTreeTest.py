@@ -111,7 +111,7 @@ def classifyBinaryData(tree):
 	for data in documentMatrix:
 		classifiedBinary.append(classify(data, tree).keys()[0])
 
-def dTreeTest(path, modelFile):
+def testDTree(path, modelFile):
 	trees = readTreeModelFile(modelFile)
 	bow = trees[2]
 	tree = trees[0]
@@ -126,8 +126,7 @@ def dTreeTest(path, modelFile):
 			counter+=1
 		else:
 			counter2+=1
-	print counter2
-	print (counter/(len(documentMatrix) * 1.0) * 100)
+	print "Accuracy for Frequency" + str((counter/(len(documentMatrix) * 1.0) * 100))
 
 	counter3 = 0
 	counter4 = 0
@@ -136,5 +135,4 @@ def dTreeTest(path, modelFile):
 			counter3+=1
 		else:
 			counter4+=1
-	print counter4
-	print (counter3/(len(documentBinaryMatrix) * 1.0) * 100)
+	print "Accuracy for Binary" + str((counter3/(len(documentBinaryMatrix) * 1.0) * 100))
