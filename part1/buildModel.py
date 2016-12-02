@@ -1,11 +1,8 @@
-import os
-import re
 from utilities import *
 from detectSpam import *
 from stopWords import *
 from collections import Counter
 import pickle
-
 
 spamWordCount = Counter()
 binarySpamWordCount = Counter()
