@@ -2,6 +2,8 @@ from sys import argv
 
 import buildModel
 import detectSpam
+import dTreeTrain
+import dTreeTest
 
 if len(argv) != 5:
     print("USAGE: Mode technique directory model_file")
@@ -22,9 +24,9 @@ if technique == "bayes":
         exit(1)
 elif technique == "dt":
     if mode == "train":
-        pass
+        dTreeTrain.trainDTree(directory, modelFile)
     elif mode == "test":
-        pass
+        dTreeTest.testDTree(directory, modelFile)
     else:
         print("Invalid parameter")
         exit(1)
