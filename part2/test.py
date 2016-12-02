@@ -1,46 +1,35 @@
 import os
-import email
+from collections import Counter, defaultdict
+
 import utils
-import math
 
 
-
-
-def test_data(model,dataset_dir):
+# Perform testing with the data in the dataset directory using our model.
+def test_data(model, dataset_dir):
+    confusion_matrix = defaultdict(Counter)
     doc_count = 0
     count_correct_classification = 0
+    print("Testing Data...")
+    print("Please wait...")
     for topic in os.listdir(dataset_dir):
 
         if topic.startswith('.'):
             continue
         topic_dir = dataset_dir + "/" + topic
 
-        for file in os.listdir(topic_dir):
-            topic_prob = {}
+        for test_file in os.listdir(topic_dir):
             doc_count += 1
-            file_path = topic_dir + "/" + file
-            f_ptr = open(file_path, "r")
-            email_obj = email.message_from_file(f_ptr)
-            f_ptr.close()
-            content = email_obj.get_payload()
-            words = utils.sanitize_content(content)
+            file_path = topic_dir + "/" + test_file
+            words = utils.get_file_content(file_path)
+            # Topic classified using our model.
+            classified_topic = utils.find_topic(model, words)
 
-            # for cur_topic in model.topics.keys():
-            #     prob = 0.0
-            #     for word in words:
-            #         prob += math.log(model.find_prob(word,cur_topic))
-            #     prob += math.log(model.find_topic_prob(cur_topic))
-            #     topic_prob[cur_topic] = prob
-            classified_topic = utils.find_topic(model,words)
-
+            # Is it the same as our ground truth?
             if classified_topic == topic:
                 count_correct_classification += 1
-            else:
-                #print("Document was classified as %s but ground truth was %s" %(classified_topic,topic))
-                print(count_correct_classification)
-    print("Number of documents read = %d" %doc_count)
-    print("Number of true classification = %d" %count_correct_classification)
-    print("Accuracy: %f" %((float(count_correct_classification)/doc_count) * 100))
 
+            # Tabulate results into our confusion matrix.
+            confusion_matrix[topic][classified_topic] += 1
 
-
+    # Return the result object.
+    return utils.Result(confusion_matrix, count_correct_classification, doc_count)
